@@ -1,0 +1,10 @@
+Tạo model: 
+	npx sequelize-cli model:generate --name (User) --attributes (firstName:string,lastName:string,email:string)
+
+Tạo migrations:
+	npx sequelize-cli db:migrate
+
+Tạo Seeder:
+	npx sequelize-cli seed:generate --name demo-(user)
+
+	npx sequelize-cli db:seed:all
