@@ -1,5 +1,4 @@
 'use strict';
-const { type } = require('express/lib/response');
 const {
   Model
 } = require('sequelize');
@@ -11,7 +10,13 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // define association here 1->n
+      User.belongsTo(models.Allcode, { foreignKey: 'positionId', targetKey: 'keyMap', as: 'positionData' }) //n-1
+      User.belongsTo(models.Allcode, { foreignKey: 'gender', targetKey: 'keyMap', as: 'genderData' }) //n-1
+      User.hasOne(models.Markdown, { foreignKey: 'doctorId' }) //1-1
+      User.hasOne(models.Doctor_Info, { foreignKey: 'doctorId' }) //1-1
+      User.hasMany(models.Schedule, { foreignKey: 'doctorId', as: 'doctorData' }) //1-n
+      User.hasMany(models.Booking, { foreignKey: 'patientId', as: 'patientData' }) //1-n
     }
   };
   User.init({
@@ -21,11 +26,10 @@ module.exports = (sequelize, DataTypes) => {
     lastName: DataTypes.STRING,
     address: DataTypes.STRING,
     phonenumber: DataTypes.STRING,
-    gender: DataTypes.BOOLEAN,
-    roleId: DataTypes.STRING,
-    positionId: DataTypes.STRING,
+    gender: DataTypes.STRING,
     image: DataTypes.STRING,
-
+    roleId: DataTypes.STRING,
+    positionId: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

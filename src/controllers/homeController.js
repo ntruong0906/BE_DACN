@@ -1,84 +1,75 @@
-import db from '../models/index'
-import CRUDService from '../services/CRUDService'
-
+import db from "../models/index"
+import CRUDService from "../services/CRUDService"
 
 let getHomePage = async (req, res) => {
     try {
-        let data = await db.User.findAll();
+        let data = await db.User.findAll()
         return res.render('homepage.ejs', {
             data: JSON.stringify(data)
-        });
+        })
     } catch (e) {
-        console.log(e);
+        console.log(e)
     }
 }
 
 let getAboutPage = (req, res) => {
-    return res.render('test/about.ejs');
+    return res.render('test/about.ejs')
 }
 
 let getCRUD = (req, res) => {
-    return res.render('test/crud.ejs');
+    return res.render('crud.ejs')
 }
 
 let postCRUD = async (req, res) => {
-    let message = await CRUDService.createNewUser(req.body);
-    console.log(message);
-    return res.send('post crud from server');
+    let message = await CRUDService.createNewUser(req.body)
+    return res.send('Post CRUD')
 }
 
-
-let displayCRUD = async (req, res) => {
-    let data = await CRUDService.getAllUser();
-    console.log(data);
-    return res.render('test/displayCRUD.ejs', {
+let displayGetCRUD = async (req, res) => {
+    let data = await CRUDService.getAllUser()
+    return res.render('displayCRUD.ejs', {
         dataTable: data
-    });
-
-
-
+    })
 }
 
-let editCRUD = async (req, res) => {
-    let userId = req.query.id;
-    if (userId) {
-        let userData = await CRUDService.getUserInfoById(userId);
-        console.log(userData);
-        return res.render('test/editCRUD.ejs', {
+let getEditCRUD = async (req, res) => {
+    let userId = req.query.id
+    if(userId){
+        let userData = await CRUDService.getUserInfoById(userId)
+        return res.render('editCRUD.ejs', {
             user: userData
         })
-
-    } else {
-        return res.send('user not found');
+    }
+    else{
+        return res.send('User not found!!!')
     }
 }
 
 let putCRUD = async (req, res) => {
     let data = req.body;
-    let allUser = await CRUDService.updateUserData(data);
-    return res.render('test/displayCRUD.ejs', {
-        dataTable: allUser
-    });
+    let allUsers =  await CRUDService.updateUserData(data)
+     return res.render('displayCRUD.ejs', {
+        dataTable: allUsers
+    })
 }
 
 let deleteCRUD = async (req, res) => {
-    let userId = req.query.id;
-    if (userId) {
-        await CRUDService.deleteUser(userId);
-        return res.send('delete success');
-    } else {
-        return res.send('user not found');
+    let id = req.query.id
+    if(id){
+        await CRUDService.deleteUserById(id)
+        return res.redirect('/get-crud')
+    }else{
+        return res.send('user not found!')
     }
 }
 
-
-module.exports = {
-    getHomePage: getHomePage,
+module.exports = { //key, value
+    getHomePage: getHomePage, 
     getAboutPage: getAboutPage,
     getCRUD: getCRUD,
     postCRUD: postCRUD,
-    displayCRUD: displayCRUD,
-    editCRUD: editCRUD,
+    displayGetCRUD: displayGetCRUD,
+    getEditCRUD: getEditCRUD,
     putCRUD: putCRUD,
-    deleteCRUD: deleteCRUD
+    deleteCRUD: deleteCRUD,
 }
