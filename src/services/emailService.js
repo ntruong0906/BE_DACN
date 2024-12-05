@@ -12,6 +12,7 @@ let sendSimpleEmail = async (dataSend) => {
             user: "phannhattruong8291@gmail.com",
             pass: "mmwpycrkqjtzkyqo",
         },
+        logger: true,
     });
 
     let info = await transporter.sendMail({
@@ -56,6 +57,9 @@ let getBodyHTMLEmail = (dataSend) => {
 let sendAttachment = async (dataSend) => {
     return new Promise(async (resolve, reject) => {
         try {
+            if (!dataSend || !dataSend.imageBase64 || !dataSend.email) {
+                return reject(new Error("Invalid dataSend object!"));
+            }
             let transporter = nodemailer.createTransport({
                 host: "smtp.gmail.com",
                 port: 465,
@@ -64,8 +68,9 @@ let sendAttachment = async (dataSend) => {
                     // user: process.env.EMAIL_APP,
                     // pass: process.env.EMAIL_APP_PASSWORD,
                     user: "phannhattruong8291@gmail.com",
-                    pass: "Q",
-                },
+                    pass: "mmwpycrkqjtzkyqo",
+},
+                logger: true,
             });
 
             let contentImg = `${dataSend.imageBase64}`
@@ -85,7 +90,8 @@ let sendAttachment = async (dataSend) => {
             });
             resolve()
         } catch (e) {
-            reject(e)
+            console.error("Error sending email:", e); // In lỗi ra console
+            reject(e);
         }
     })
 

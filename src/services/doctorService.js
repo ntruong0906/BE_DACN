@@ -499,37 +499,61 @@ let sendRemedyService = (data) => {
 }
 
 let cancelPatientService = (data) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
             if (!data.doctorId || !data.patientId) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Cancel appointment failed!'
-                })
+                });
             } else {
-                //update patient status
+                // Tìm lịch hẹn
                 let appointment = await db.Booking.findOne({
                     where: {
                         doctorId: data.doctorId,
                         patientId: data.patientId,
-                        statusId: 'S1'
+                        statusId: 'S1' // Lấy lịch hẹn đang chờ xử lý
                     },
                     raw: false
-                })
+                });
+
                 if (appointment) {
-                    appointment.statusId = 'S4'
-                    await appointment.save()
+                    // Cập nhật trạng thái hủy
+                    appointment.statusId = 'S4';
+                    await appointment.save();
+
+                    // Giảm currentNumber trong bảng Schedule
+                    let scheduleBookingData = await db.Schedule.findOne({
+                        where: {
+                            doctorId: data.doctorId,
+                            timeType: appointment.timeType,
+                            date: appointment.date
+                        },
+                        raw: false
+                    });
+
+                    if (scheduleBookingData && scheduleBookingData.currentNumber > 0) {
+                        scheduleBookingData.currentNumber -= 1; // Giảm số lượng
+                        await scheduleBookingData.save();
+                    }
+
+                    resolve({
+                        errCode: 0,
+                        errMessage: 'Cancel appointment and update schedule succeed!'
+                    });
+                } else {
+                    resolve({
+                        errCode: 2,
+                        errMessage: 'Appointment not found or already cancelled!'
+                    });
                 }
-                resolve({
-                    errCode: 0,
-                    errMessage: 'OK'
-                })
             }
         } catch (e) {
-            reject(e)
+            reject(e);
         }
-    })
-}
+    });
+};
+
 
 module.exports = {
     getTopDoctorHomeService: getTopDoctorHomeService, cancelPatientService: cancelPatientService,
